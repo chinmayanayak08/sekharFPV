@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-dark-950 text-white font-poppins overflow-x-hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-montserrat;
+  }
+}
+
+@layer components {
+  .navbar-blur {
+    @apply backdrop-blur-md bg-dark-950/40 border-b border-white/10;
+  }
+
+  .glass-effect {
+    @apply bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-magenta bg-clip-text text-transparent;
+  }
+
+  .glow-button {
+    @apply relative px-8 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg;
+  }
+
+  .glow-button-primary {
+    @apply bg-gradient-to-r from-neon-cyan to-neon-purple hover:shadow-[0_0_30px_rgba(0,212,255,0.5)];
+  }
+
+  .glow-button-secondary {
+    @apply bg-transparent border border-neon-cyan hover:bg-neon-cyan/10 text-neon-cyan;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(0,212,255,0.3)];
+  }
+
+  .section-title {
+    @apply text-4xl md:text-5xl font-bold text-center mb-4;
+  }
+
+  .section-subtitle {
+    @apply text-lg text-gray-300 text-center mb-16 max-w-2xl mx-auto;
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0e27;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #00d4ff, #b300ff);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #39ff14, #00d4ff);
+}
+
+/* Particle effect styles */
+.particle {
+  position: fixed;
+  pointer-events: none;
+}
+
+/* Selection style */
+::selection {
+  background: rgba(0, 212, 255, 0.3);
+  color: #00d4ff;
+}
