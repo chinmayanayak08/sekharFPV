@@ -262,7 +262,7 @@ const AdminPanel = ({ onClose }: { onClose: () => void }) => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
-    if (loginUsername.trim() === 'admin' && loginPassword === 'sekhar@fpv') {
+    if (loginUsername.trim() === 'sekharpahi2006' && loginPassword === 'sekhar@fpv') {
       setIsAuthenticated(true)
       sessionStorage.setItem('sekharFPVIsAdmin', 'true')
       setLoginError('')
@@ -570,12 +570,7 @@ const AdminPanel = ({ onClose }: { onClose: () => void }) => {
               </motion.button>
             </form>
 
-            <div className="glass-effect p-4 rounded-xl border border-neon-cyan/20 text-center text-xs space-y-1">
-              <p className="text-gray-400">Default Demo Credentials:</p>
-              <p className="text-neon-cyan font-mono">
-                Username: <span className="text-white">admin</span> | Password: <span className="text-white">sekhar@fpv</span>
-              </p>
-            </div>
+            {/* Credentials hint block removed for security */}
           </div>
         ) : (
           /* Customization Dashboard */
