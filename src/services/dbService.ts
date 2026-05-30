@@ -53,7 +53,7 @@ export async function loadAdminData(): Promise<AdminData | null> {
 /**
  * Save admin data to both the cloud database (if configured) and localStorage
  */
-export async function saveAdminData(data: AdminData): Promise<boolean> {
+export async function saveAdminData(data: AdminData): Promise<{ success: boolean; error?: string }> {
   // Always save to localStorage first as a local cache
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data))
 
@@ -68,14 +68,21 @@ export async function saveAdminData(data: AdminData): Promise<boolean> {
 
       if (error) {
         console.error('Failed to save admin data to database:', error)
-        return false
+        return { success: false, error: error.message || JSON.stringify(error) }
       }
-      return true
-    } catch (e) {
+      return { success: true }
+    } catch (e: any) {
       console.error('Failed to save admin data to database:', e)
-      return false
+      const msg = e?.message || String(e)
+      if (msg.includes('Failed to fetch') || msg.includes('fetch')) {
+        return { 
+          success: false, 
+          error: 'Network error (Failed to fetch). This is commonly caused by adblockers, Brave Shields, or browser privacy extensions blocking Supabase.' 
+        }
+      }
+      return { success: false, error: msg }
     }
   }
 
-  return true
+  return { success: true }
 }

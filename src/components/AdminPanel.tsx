@@ -452,15 +452,15 @@ const AdminPanel = ({ onClose }: { onClose: () => void }) => {
 
   const handleSave = async () => {
     setAdminData(tempData)
-    const success = await saveAdminData(tempData)
-    if (success) {
+    const result = await saveAdminData(tempData)
+    if (result.success) {
       setSaveMessage('✓ Changes saved successfully!')
     } else {
-      setSaveMessage('⚠️ Saved locally, but failed to sync to database.')
+      setSaveMessage(`⚠️ Saved locally, but failed to sync to database: ${result.error || 'Unknown error'}`)
     }
     setIsEditing(false)
 
-    setTimeout(() => setSaveMessage(''), 3000)
+    setTimeout(() => setSaveMessage(''), 6000)
 
     window.dispatchEvent(
       new CustomEvent('adminDataUpdated', { detail: tempData })
