@@ -1,15 +1,32 @@
 import { createClient } from '@supabase/supabase-js'
 import { AdminData } from '../App'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const getSanitizedSupabaseUrl = (): string => {
+  let url = (import.meta.env.VITE_SUPABASE_URL || '').trim()
+  // Remove any trailing slashes
+  url = url.replace(/\/+$/, '')
+  // Remove trailing /rest/v1 if included accidentally by user or CI config
+  if (url.endsWith('/rest/v1')) {
+    url = url.slice(0, -8)
+  }
+  // Remove any trailing slashes again
+  url = url.replace(/\/+$/, '')
+  return url
+}
+
+const getSanitizedAnonKey = (): string => {
+  return (import.meta.env.VITE_SUPABASE_ANON_KEY || '').trim()
+}
+
+const supabaseUrl = getSanitizedSupabaseUrl()
+const supabaseAnonKey = getSanitizedAnonKey()
 
 const LOCAL_STORAGE_KEY = 'sekharFPVAdminData'
 
 // Initialize Supabase only if environment variables are set
 export const isDbConfigured = !!(supabaseUrl && supabaseAnonKey)
 
-export const supabase = isDbConfigured && supabaseUrl && supabaseAnonKey
+export const supabase = isDbConfigured
   ? createClient(supabaseUrl, supabaseAnonKey)
   : null
 
