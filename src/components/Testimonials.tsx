@@ -2,6 +2,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Star, Upload, MessageSquare, Check } from 'lucide-react'
 import React, { useState, useRef } from 'react'
 import { AdminData, TestimonialItem } from '../App'
+import { saveAdminData } from '../services/dbService'
+
 
 interface TestimonialsProps {
   adminData: AdminData
@@ -81,8 +83,8 @@ const Testimonials = ({ adminData }: TestimonialsProps) => {
       testimonials: updatedTestimonials,
     }
 
-    // Save to localStorage
-    localStorage.setItem('sekharFPVAdminData', JSON.stringify(updatedAdminData))
+    // Save to database & localStorage
+    saveAdminData(updatedAdminData)
 
     // Dispatch update event
     window.dispatchEvent(

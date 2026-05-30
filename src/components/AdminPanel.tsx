@@ -7,6 +7,8 @@ import {
 } from 'lucide-react'
 import defaultProfile from '../assets/profile.jpg'
 import { ServiceItem, PortfolioItem, TestimonialItem, AdminData } from '../App'
+import { loadAdminData, saveAdminData } from '../services/dbService'
+
 
 const AdminPanel = ({ onClose }: { onClose: () => void }) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -222,42 +224,34 @@ const AdminPanel = ({ onClose }: { onClose: () => void }) => {
     const isAuth = sessionStorage.getItem('sekharFPVIsAdmin') === 'true'
     setIsAuthenticated(isAuth)
 
-    const savedData = localStorage.getItem('sekharFPVAdminData')
-    if (savedData) {
-      try {
-        const parsed = JSON.parse(savedData)
-        const mergedData: AdminData = {
-          name: parsed.name || defaultData.name,
-          email: parsed.email || defaultData.email,
-          phone: parsed.phone || defaultData.phone,
-          instagram: parsed.instagram || defaultData.instagram,
-          profileImage: parsed.profileImage || defaultData.profileImage,
-          aboutMe: parsed.aboutMe || defaultData.aboutMe,
-          experience: parsed.experience || defaultData.experience,
-          flightTime: parsed.flightTime || defaultData.flightTime,
-          projectsCompleted: parsed.projectsCompleted || defaultData.projectsCompleted,
-          quote: parsed.quote || defaultData.quote,
-          services: parsed.services || defaultData.services,
-          portfolioItems: parsed.portfolioItems ? parsed.portfolioItems.map((item: any, i: number) => ({
-            ...item,
-            videoUrl: item.videoUrl || (defaultData.portfolioItems[i] ? defaultData.portfolioItems[i].videoUrl : 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4')
-          })) : defaultData.portfolioItems,
-          testimonials: parsed.testimonials || defaultData.testimonials,
-        }
-        setAdminData(mergedData)
-        setTempData(mergedData)
-        setImagePreview(mergedData.profileImage)
-      } catch (e) {
-        console.error('Failed to parse admin data', e)
-        setAdminData(defaultData)
-        setTempData(defaultData)
-        setImagePreview(defaultProfile)
+    const fetchData = async () => {
+      const dbData = await loadAdminData()
+      const dataToUse = dbData || defaultData
+
+      const mergedData: AdminData = {
+        name: dataToUse.name || defaultData.name,
+        email: dataToUse.email || defaultData.email,
+        phone: dataToUse.phone || defaultData.phone,
+        instagram: dataToUse.instagram || defaultData.instagram,
+        profileImage: dataToUse.profileImage || defaultData.profileImage,
+        aboutMe: dataToUse.aboutMe || defaultData.aboutMe,
+        experience: dataToUse.experience || defaultData.experience,
+        flightTime: dataToUse.flightTime || defaultData.flightTime,
+        projectsCompleted: dataToUse.projectsCompleted || defaultData.projectsCompleted,
+        quote: dataToUse.quote || defaultData.quote,
+        services: dataToUse.services || defaultData.services,
+        portfolioItems: dataToUse.portfolioItems ? dataToUse.portfolioItems.map((item: any, i: number) => ({
+          ...item,
+          videoUrl: item.videoUrl || (defaultData.portfolioItems[i] ? defaultData.portfolioItems[i].videoUrl : 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4')
+        })) : defaultData.portfolioItems,
+        testimonials: dataToUse.testimonials || defaultData.testimonials,
       }
-    } else {
-      setAdminData(defaultData)
-      setTempData(defaultData)
-      setImagePreview(defaultProfile)
+      setAdminData(mergedData)
+      setTempData(mergedData)
+      setImagePreview(mergedData.profileImage)
     }
+
+    fetchData()
   }, [])
 
   const handleLogin = (e: React.FormEvent) => {
@@ -456,13 +450,17 @@ const AdminPanel = ({ onClose }: { onClose: () => void }) => {
     }))
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setAdminData(tempData)
-    localStorage.setItem('sekharFPVAdminData', JSON.stringify(tempData))
-    setSaveMessage('✓ Changes saved successfully!')
+    const success = await saveAdminData(tempData)
+    if (success) {
+      setSaveMessage('✓ Changes saved successfully!')
+    } else {
+      setSaveMessage('⚠️ Saved locally, but failed to sync to database.')
+    }
     setIsEditing(false)
 
-    setTimeout(() => setSaveMessage(''), 2000)
+    setTimeout(() => setSaveMessage(''), 3000)
 
     window.dispatchEvent(
       new CustomEvent('adminDataUpdated', { detail: tempData })

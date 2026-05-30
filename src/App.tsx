@@ -10,6 +10,7 @@ import Contact from './components/Contact'
 import Footer from './components/Footer'
 import AdminPanel from './components/AdminPanel'
 import defaultProfile from './assets/profile.jpg'
+import { loadAdminData } from './services/dbService'
 
 export interface ServiceItem {
   iconName: string
@@ -245,20 +246,18 @@ function App() {
     // Smooth scroll behavior
     document.documentElement.style.scrollBehavior = 'smooth'
 
-    // Load admin data from localStorage
-    const savedData = localStorage.getItem('sekharFPVAdminData')
-    if (savedData) {
-      try {
-        const parsed = JSON.parse(savedData)
+    // Load admin data from database or localStorage
+    const fetchData = async () => {
+      const data = await loadAdminData()
+      if (data) {
         setAdminData((prev) => ({
           ...prev,
-          ...parsed,
-          profileImage: parsed.profileImage || defaultProfile,
+          ...data,
+          profileImage: data.profileImage || defaultProfile,
         }))
-      } catch (e) {
-        console.error('Failed to parse admin data', e)
       }
     }
+    fetchData()
 
     // Listen for admin data updates
     const handleAdminUpdate = (event: CustomEvent) => {
