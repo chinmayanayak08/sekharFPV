@@ -26,6 +26,7 @@ const AdminPanel = ({ onClose }: { onClose: () => void }) => {
     flightTime: "500+ Hours",
     projectsCompleted: "100+ Projects",
     quote: "Every frame tells a story. My goal is to capture moments that are not just seen, but felt. That's what makes a cinematic experience truly unforgettable.",
+    web3formsKey: '',
     services: [
       {
         iconName: 'Camera',
@@ -245,6 +246,7 @@ const AdminPanel = ({ onClose }: { onClose: () => void }) => {
           videoUrl: item.videoUrl || (defaultData.portfolioItems[i] ? defaultData.portfolioItems[i].videoUrl : 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4')
         })) : defaultData.portfolioItems,
         testimonials: dataToUse.testimonials || defaultData.testimonials,
+        web3formsKey: dataToUse.web3formsKey || defaultData.web3formsKey || '',
       }
       setAdminData(mergedData)
       setTempData(mergedData)
@@ -738,6 +740,32 @@ const AdminPanel = ({ onClose }: { onClose: () => void }) => {
                         value={tempData.instagram}
                         onChange={handleInputChange}
                         disabled={!isEditing}
+                        className={`w-full px-4 py-2 text-sm rounded-lg border transition-colors ${
+                          isEditing
+                            ? 'bg-dark-800/50 border-gray-700 text-white focus:border-neon-cyan focus:outline-none'
+                            : 'bg-dark-700 border-gray-800 text-gray-400 cursor-not-allowed'
+                        }`}
+                      />
+                    </div>
+                    <div className="md:col-span-2 mt-2">
+                      <label className="block text-gray-300 font-semibold mb-1 text-sm flex items-center justify-between">
+                        <span>Web3Forms Access Key (for Booking Emails)</span>
+                        <a 
+                          href="https://web3forms.com" 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-xs text-neon-cyan hover:underline"
+                        >
+                          Get Free Key from web3forms.com
+                        </a>
+                      </label>
+                      <input
+                        type="text"
+                        name="web3formsKey"
+                        value={tempData.web3formsKey || ''}
+                        onChange={handleInputChange}
+                        disabled={!isEditing}
+                        placeholder="Enter Web3Forms Access Key to receive client booking emails"
                         className={`w-full px-4 py-2 text-sm rounded-lg border transition-colors ${
                           isEditing
                             ? 'bg-dark-800/50 border-gray-700 text-white focus:border-neon-cyan focus:outline-none'

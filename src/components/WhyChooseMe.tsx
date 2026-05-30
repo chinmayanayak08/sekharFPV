@@ -1,7 +1,32 @@
 import { motion } from 'framer-motion'
 import { Zap, Shield, Lightbulb, RefreshCw, Lock, Sparkles } from 'lucide-react'
+import { AdminData } from '../App'
 
-const WhyChooseMe = () => {
+interface WhyChooseMeProps {
+  adminData?: AdminData
+}
+
+const parseStat = (value: string | undefined, defaultNum: string, defaultLabel: string) => {
+  if (!value) return { number: defaultNum, label: defaultLabel }
+  const match = value.match(/^([0-9+\-%kK]+)\s*(.*)$/)
+  if (match) {
+    const num = match[1]
+    const label = match[2]
+    return {
+      number: num,
+      label: label
+        ? label.toLowerCase().includes('project') && !label.toLowerCase().includes('completed')
+          ? 'Projects Completed'
+          : label.toLowerCase().includes('hour') && !label.toLowerCase().includes('flight')
+          ? 'Flight Hours'
+          : label.charAt(0).toUpperCase() + label.slice(1)
+        : defaultLabel,
+    }
+  }
+  return { number: value, label: defaultLabel }
+}
+
+const WhyChooseMe = ({ adminData }: WhyChooseMeProps) => {
   const features = [
     {
       icon: Zap,
@@ -123,10 +148,10 @@ const WhyChooseMe = () => {
           className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6"
         >
           {[
-            { number: '100+', label: 'Projects Completed' },
+            parseStat(adminData?.projectsCompleted, '100+', 'Projects Completed'),
             { number: '98%', label: 'Client Satisfaction' },
-            { number: '500+', label: 'Flight Hours' },
-            { number: '30+', label: 'Industries Served' },
+            parseStat(adminData?.flightTime, '500+', 'Flight Hours'),
+            { number: '30%', label: 'Industries Served' },
           ].map((stat, i) => (
             <motion.div
               key={i}

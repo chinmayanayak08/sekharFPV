@@ -51,6 +51,7 @@ export interface AdminData {
   services: ServiceItem[]
   portfolioItems: PortfolioItem[]
   testimonials: TestimonialItem[]
+  web3formsKey?: string
 }
 
 function App() {
@@ -66,6 +67,7 @@ function App() {
     flightTime: "500+ Hours",
     projectsCompleted: "100+ Projects",
     quote: "Every frame tells a story. My goal is to capture moments that are not just seen, but felt. That's what makes a cinematic experience truly unforgettable.",
+    web3formsKey: '',
     services: [
       {
         iconName: 'Camera',
@@ -280,7 +282,7 @@ function App() {
       <About adminData={adminData} />
       <Services adminData={adminData} />
       <Portfolio adminData={adminData} />
-      <WhyChooseMe />
+      <WhyChooseMe adminData={adminData} />
       <Testimonials adminData={adminData} />
       <Contact adminData={adminData} />
       <Footer adminData={adminData} />

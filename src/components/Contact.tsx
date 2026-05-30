@@ -17,6 +17,8 @@ const Contact = ({ adminData }: ContactProps) => {
   })
 
   const [submitted, setSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -25,12 +27,61 @@ const Contact = ({ adminData }: ContactProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Form submitted:', formData)
-    setSubmitted(true)
-    setTimeout(() => {
-      setSubmitted(false)
-      setFormData({ name: '', email: '', phone: '', projectType: '', message: '' })
-    }, 3000)
+    setIsSubmitting(true)
+    setErrorMsg('')
+    
+    const key = adminData.web3formsKey?.trim()
+    if (!key) {
+      // Simulate form submission locally if key is not configured
+      console.log('Form submitted (Simulated):', formData)
+      setSubmitted(true)
+      setIsSubmitting(false)
+      setTimeout(() => {
+        setSubmitted(false)
+        setFormData({ name: '', email: '', phone: '', projectType: '', message: '' })
+      }, 3000)
+      return
+    }
+
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: key,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || 'N/A',
+          subject: `New FPV Booking Request from ${formData.name}`,
+          from_name: `${formData.name} (via FPV Portfolio)`,
+          replyto: formData.email,
+          message: `You received a new FPV drone booking request details:\n\n` +
+            `- Client Name: ${formData.name}\n` +
+            `- Email Address: ${formData.email}\n` +
+            `- Phone Number: ${formData.phone || 'N/A'}\n` +
+            `- Project Type: ${formData.projectType.toUpperCase()}\n\n` +
+            `Project Vision / Details:\n` +
+            `${formData.message}`
+        }),
+      })
+
+      const data = await response.json()
+      if (data.success) {
+        setSubmitted(true)
+        setFormData({ name: '', email: '', phone: '', projectType: '', message: '' })
+        setTimeout(() => setSubmitted(false), 4000)
+      } else {
+        setErrorMsg(data.message || 'Failed to send inquiry. Please try again.')
+      }
+    } catch (err) {
+      console.error('Email send error:', err)
+      setErrorMsg('Network error. Please check your connection or contact directly via phone/socials.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const contactMethods = [
@@ -275,21 +326,35 @@ const Contact = ({ adminData }: ContactProps) => {
                 />
               </motion.div>
 
+              {/* Error Message */}
+              {errorMsg && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-red-400 text-sm font-semibold text-center bg-red-500/10 border border-red-500/20 py-2 rounded-lg"
+                >
+                  {errorMsg}
+                </motion.div>
+              )}
+
               {/* Submit Button */}
               <motion.button
                 type="submit"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                disabled={isSubmitting}
+                whileHover={isSubmitting ? {} : { scale: 1.05 }}
+                whileTap={isSubmitting ? {} : { scale: 0.95 }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
                 className={`w-full glow-button ${
                   submitted
                     ? 'glow-button-secondary'
+                    : isSubmitting
+                    ? 'bg-gray-700 text-gray-400 cursor-wait'
                     : 'glow-button-primary'
                 } text-dark-950 transition-all`}
               >
-                {submitted ? '✓ Message Sent!' : 'Send Inquiry'}
+                {submitted ? '✓ Message Sent!' : isSubmitting ? 'Sending Inquiry...' : 'Send Inquiry'}
               </motion.button>
             </form>
 
